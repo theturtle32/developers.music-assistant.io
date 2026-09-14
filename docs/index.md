@@ -10,6 +10,14 @@ Developer docs
 We recommend developing on a (recent) macOS or Linux machine.
 It is recommended to use Visual Studio Code as your IDE, since launch files to start Music Assistant are provided as part of the repository. Furthermore, the current code base is not verified to work on a native Windows machine. If you would like to develop on a Windows machine, install [WSL2](https://code.visualstudio.com/blogs/2019/09/03/wsl2) to increase your swag-level 🤘.
 
+## 🏛 Architecture
+
+The [Architecture](architecture/index.md) section explains how the server fits together, with a
+page per subsystem and reading paths for the common starting points. It hands off to the
+[package docs](packages/index.md), which are the `README.md` files living beside the code. Both are
+pulled from the [server repository](https://github.com/music-assistant/server) when this site is
+built, so they stay in step with the code they describe.
+
 ## 🚀 Setting up your development environment
 
 ### Python venv (recommended)

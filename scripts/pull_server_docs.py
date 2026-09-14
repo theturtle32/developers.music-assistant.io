@@ -177,6 +177,41 @@ def _architecture_order(architecture: Path) -> list[str]:
     return ordered
 
 
+def _write_packages_index(packages: Path) -> None:
+    """
+    Write a landing page listing every copied package, grouped by kind.
+
+    The packages tree has no counterpart in the server repo, so unlike every other page here this
+    one is generated rather than copied.
+
+    :param packages: The copied packages directory.
+    """
+    lines = [
+        "# Package docs",
+        "",
+        "Documentation living beside the code it describes, copied from the",
+        "[server repository](https://github.com/music-assistant/server). Start from the",
+        "[architecture](../architecture/index.md) pages for the big picture; these hold the detail.",
+    ]
+    for group, heading in (("controllers", "Controllers"), ("providers", "Providers")):
+        group_dir = packages / group
+        if not group_dir.is_dir():
+            continue
+        lines += ["", f"## {heading}", ""]
+        for index in sorted(group_dir.rglob("index.md")):
+            name = index.parent.relative_to(group_dir).as_posix()
+            lines.append(f"- [{name}]({group}/{name}/index.md): {_title_of(index)}")
+    (packages / "index.md").write_text("\n".join(lines) + "\n")
+
+
+def _title_of(index: Path) -> str:
+    """Return a page's first heading, for use as a link description."""
+    for line in index.read_text("utf-8").splitlines():
+        if line.startswith("# "):
+            return line[2:].strip()
+    return ""
+
+
 def _write_nav_files(output: Path) -> None:
     """Write the nav files that give the copied trees a sensible order and titles."""
     architecture = output / ARCHITECTURE_DEST
@@ -190,6 +225,7 @@ def _write_nav_files(output: Path) -> None:
 
     packages = output / PACKAGE_DEST
     if packages.is_dir():
+        _write_packages_index(packages)
         (packages / ".nav.yml").write_text(
             "title: Package docs\nuse_index_title: true\nsort:\n  by: filename\n"
         )
