@@ -181,27 +181,32 @@ def _write_packages_index(packages: Path) -> None:
     """
     Write a landing page listing every copied package, grouped by kind.
 
-    The packages tree has no counterpart in the server repo, so unlike every other page here this
-    one is generated rather than copied.
+    The package root's own README is copied here, so the listing is appended beneath whatever it
+    says rather than replacing it. Only the listing is generated; it has no counterpart in the
+    server repo.
 
     :param packages: The copied packages directory.
     """
-    lines = [
-        "# Package docs",
-        "",
-        "Documentation living beside the code it describes, copied from the",
-        "[server repository](https://github.com/music-assistant/server). Start from the",
-        "[architecture](../architecture/index.md) pages for the big picture; these hold the detail.",
-    ]
+    index = packages / "index.md"
+    if index.is_file():
+        lines = [index.read_text("utf-8").rstrip()]
+    else:
+        lines = [
+            "# Package docs",
+            "",
+            "Documentation living beside the code it describes, copied from the",
+            "[server repository](https://github.com/music-assistant/server). Start from the",
+            "[architecture](../architecture/index.md) pages for the big picture; these hold the detail.",
+        ]
     for group, heading in (("controllers", "Controllers"), ("providers", "Providers")):
         group_dir = packages / group
         if not group_dir.is_dir():
             continue
         lines += ["", f"## {heading}", ""]
-        for index in sorted(group_dir.rglob("index.md")):
-            name = index.parent.relative_to(group_dir).as_posix()
-            lines.append(f"- [{name}]({group}/{name}/index.md): {_title_of(index)}")
-    (packages / "index.md").write_text("\n".join(lines) + "\n")
+        for group_index in sorted(group_dir.rglob("index.md")):
+            name = group_index.parent.relative_to(group_dir).as_posix()
+            lines.append(f"- [{name}]({group}/{name}/index.md): {_title_of(group_index)}")
+    index.write_text("\n".join(lines) + "\n")
 
 
 def _title_of(index: Path) -> str:

@@ -19,4 +19,11 @@ else
   git clone --depth 1 --branch dev https://github.com/music-assistant/server.git "${server}"
 fi
 
-python scripts/pull_server_docs.py "${server}" --output docs
+# prefer python3: a bare `python` is absent on macOS and on many distros, while CI provides both
+python_bin="$(command -v python3 || command -v python)"
+if [ -z "${python_bin}" ]; then
+  echo "No python interpreter found on PATH" >&2
+  exit 1
+fi
+
+"${python_bin}" scripts/pull_server_docs.py "${server}" --output docs
