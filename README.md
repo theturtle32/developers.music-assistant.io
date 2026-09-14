@@ -19,18 +19,34 @@ no effect; the change belongs in the server repo, either in its `docs/architectu
 
 ## Building locally
 
-```bash
-pip install -r requirements.txt
+Install into an environment of its own rather than system-wide. The dependencies need **Python
+3.10 or newer**; a `python3 -m venv` on a machine whose system Python is older fails with a
+confusing `No matching distribution found for mkdocs-awesome-nav`.
 
+With [uv](https://docs.astral.sh/uv/), which picks a suitable interpreter for you and needs no
+environment at all:
+
+```bash
 # pull the architecture and package docs out of a server checkout
 scripts/pull-server-docs.sh ../music-assistant-server
 
+uv run --with-requirements requirements.txt mkdocs serve
+```
+
+Or with a virtualenv, if you would rather have one to activate:
+
+```bash
+uv venv --python 3.12          # or: python3.12 -m venv .venv
+source .venv/bin/activate
+uv pip install -r requirements.txt   # or: pip install -r requirements.txt
+
+scripts/pull-server-docs.sh ../music-assistant-server
 mkdocs serve
 ```
 
-Then open <http://127.0.0.1:8000>.
+Either way, open <http://127.0.0.1:8000>. `.venv/` is git-ignored.
 
-Run the pull script **before** `mkdocs serve`, or the Architecture and Package docs sections will be
+Run the pull script **before** serving, or the Architecture and Package docs sections will be
 missing. Re-run it whenever the server docs change; `mkdocs serve` picks the new files up on its own
 once they are on disk.
 
@@ -41,12 +57,7 @@ handy for a one-off but slower:
 scripts/pull-server-docs.sh
 ```
 
-To check the built output without serving it:
-
-```bash
-mkdocs build
-```
-
+To check the built output without serving it, substitute `mkdocs build` for `mkdocs serve`.
 `mkdocs build --strict` is stricter still, but the social-card plugin needs Cairo, which is not
 installed everywhere; if `--strict` fails only on cairo warnings, build without it.
 
@@ -56,12 +67,17 @@ These docs describe a server you will probably want running alongside them. From
 [server](https://github.com/music-assistant/server) checkout:
 
 ```bash
-scripts/setup.sh                              # venv, dependencies, pre-commit hooks
+scripts/setup.sh              # creates .venv, installs dependencies and pre-commit hooks
+source .venv/bin/activate
 python -m music_assistant --log-level debug   # http://localhost:8095
 ```
 
-It needs Python 3.14+ and ffmpeg 7+. See the server's `DEVELOPMENT.md` for building a provider, and
-its `docs/architecture/README.md` for how the pieces fit together.
+That setup script uses uv and builds its own virtualenv, which is separate from the one this
+repository uses. Activate it before running the server, or `python -m music_assistant` will not find
+the package.
+
+The server needs Python 3.14+ and ffmpeg 7+. See the server's `DEVELOPMENT.md` for building a
+provider, and its `docs/architecture/README.md` for how the pieces fit together.
 
 ## How the site is published
 
