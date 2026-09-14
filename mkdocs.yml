@@ -4,9 +4,7 @@ site_url: https://developers.music-assistant.io/
 #repo_name: music-assistant
 #repo_url: https://github.com/music-assistant
 
-nav:
-  - Home: index.md
-  - Provider setup flows: setup-flows.md
+# navigation lives in docs/.nav.yml so the generated trees can order themselves
 
 theme:
   custom_dir: overrides
@@ -37,6 +35,7 @@ extra_css:
   - stylesheets/extra.css
 
 plugins:
+  - awesome-nav
   - social:
       cards_layout_options:
         font_family: JetBrains Mono
@@ -72,7 +71,11 @@ markdown_extensions:
       generic: true
   - footnotes
   - pymdownx.details
-  - pymdownx.superfences
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
   - pymdownx.mark
   - attr_list
   - pymdownx.magiclink

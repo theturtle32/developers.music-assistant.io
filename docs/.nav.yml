@@ -1,0 +1,5 @@
+nav:
+  - Home: index.md
+  - Provider setup flows: setup-flows.md
+  - architecture
+  - packages

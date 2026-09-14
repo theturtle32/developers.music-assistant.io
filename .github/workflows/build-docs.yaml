@@ -5,6 +5,12 @@ on:
     branches:
       - master
       - main
+  # the architecture and package docs live in the server repo, so rebuild daily to pick up
+  # changes merged there. the server repo can also trigger this directly.
+  schedule:
+    - cron: "0 4 * * *"
+  repository_dispatch:
+    types: [server-docs-updated]
 permissions:
   contents: write
 jobs:
@@ -12,6 +18,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Check out the server repo for its documentation
+        uses: actions/checkout@v4
+        with:
+          repository: music-assistant/server
+          ref: dev
+          path: .server
       - name: Configure Git Credentials
         run: |
           git config user.name github-actions[bot]
@@ -27,4 +39,6 @@ jobs:
           restore-keys: |
             mkdocs-material-
       - run: pip install -r requirements.txt
+      - name: Pull the documentation out of the server repo
+        run: python scripts/pull_server_docs.py .server --output docs
       - run: mkdocs gh-deploy --force

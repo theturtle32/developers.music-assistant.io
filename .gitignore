@@ -164,3 +164,7 @@ cython_debug/
 
 # exclude the CNAME file (so we can have different one for the beta repo)
 docs/CNAME
+
+# documentation pulled from the server repo at build time
+docs/architecture/
+docs/packages/
