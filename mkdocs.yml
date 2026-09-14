@@ -36,7 +36,10 @@ extra_css:
 
 plugins:
   - awesome-nav
+  # social cards need Cairo, which most contributors do not have installed and which only renders
+  # images nobody looks at locally. GitHub Actions sets CI=true, so the cards still ship.
   - social:
+      enabled: !ENV [CI, false]
       cards_layout_options:
         font_family: JetBrains Mono
   - search:

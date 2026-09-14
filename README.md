@@ -57,9 +57,25 @@ handy for a one-off but slower:
 scripts/pull-server-docs.sh
 ```
 
-To check the built output without serving it, substitute `mkdocs build` for `mkdocs serve`.
-`mkdocs build --strict` is stricter still, but the social-card plugin needs Cairo, which is not
-installed everywhere; if `--strict` fails only on cairo warnings, build without it.
+To check the built output without serving it, substitute `mkdocs build` for `mkdocs serve`, or
+`mkdocs build --strict` to have warnings fail the build the way a broken link should.
+
+### Social cards
+
+Social cards are generated in CI only, because the plugin needs Cairo and would otherwise print a
+screenful of `cairosvg` warnings **per page** for anyone without it. Nothing else is affected;
+cards are the preview image a link unfurls into, not part of the site.
+
+To render them locally, install Cairo and opt in:
+
+```bash
+brew install cairo                       # macOS; apt install libcairo2 on Debian/Ubuntu
+export DYLD_FALLBACK_LIBRARY_PATH="$(brew --prefix)/lib"   # macOS only, see below
+CI=true mkdocs serve
+```
+
+The library path is needed because the plugin looks Cairo up through `ctypes`, which does not
+search Homebrew's prefix, so an installed Cairo still reports as missing without it.
 
 ## Running Music Assistant locally
 
