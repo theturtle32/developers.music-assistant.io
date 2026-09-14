@@ -3,14 +3,8 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - master
-      - main
-  # the architecture and package docs live in the server repo, so rebuild daily to pick up
-  # changes merged there. the server repo can also trigger this directly.
-  schedule:
-    - cron: "0 4 * * *"
-  repository_dispatch:
-    types: [server-docs-updated]
+      # preview deployment: this branch, not the upstream default branches
+      - preview
 permissions:
   contents: write
 jobs:
@@ -21,8 +15,10 @@ jobs:
       - name: Check out the server repo for its documentation
         uses: actions/checkout@v4
         with:
-          repository: music-assistant/server
-          ref: dev
+          # pinned to the fork's branch under review rather than upstream dev, which does
+          # not carry the architecture and package docs yet
+          repository: theturtle32/music-assistant-server
+          ref: docs/architecture-refresh-v2
           path: .server
       - name: Configure Git Credentials
         run: |
